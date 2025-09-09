@@ -1,7 +1,29 @@
 package main
 
-import "fmt"
+import (
+	"flag"
+	"log"
+	"net/http"
+	"fmt"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository/memory"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/controller/temperature"
+	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/handler/http"
+)
 
 func main(){
-	fmt.Println("NICEEEE!!!!!");
+	var port int
+	flag.IntVar(&port, "port", 8081, "API handler port")
+	flag.Parse()
+	log.Printf("Starting metadata service on port %d", port)
+
+	r := memory.New()
+	c := temperature.New(r)
+	h := httpHandler.New(c)
+
+	http.Handle("/getTemp", http.HandlerFunc(h.GetTemperature))
+	http.Handle("/putTemp", http.HandlerFunc(h.PutTemperature))
+
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
+		panic(err)
+	}
 }
