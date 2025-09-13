@@ -3,8 +3,8 @@ package temperature
 import (
 	"context"
 
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository"
-	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/pkg/model"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/repository"
+	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/pkg/model"
 )
 
 // This in case we implement a repo somehow else later, as long as its got these functions, jala

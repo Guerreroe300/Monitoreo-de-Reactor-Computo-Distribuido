@@ -5,9 +5,9 @@ import (
 	"log"
 	"net/http"
 	"fmt"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository/memory"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/controller/temperature"
-	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/handler/http"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/repository/memory"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/controller/temperature"
+	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/handler/http"
 )
 
 func main(){

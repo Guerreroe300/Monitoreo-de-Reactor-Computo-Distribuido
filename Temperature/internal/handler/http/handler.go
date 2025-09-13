@@ -7,8 +7,8 @@ import (
 	"encoding/json"
 	"strconv"
 
-	temperature "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/controller/temperature"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository"
+	temperature "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/controller/temperature"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/repository"
 )
 
 type Handler struct{

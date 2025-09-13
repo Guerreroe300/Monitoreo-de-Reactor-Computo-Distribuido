@@ -5,8 +5,8 @@ import (
 	"sync"
 	"time"
 
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository"
-	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/pkg/model"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/repository"
+	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/pkg/model"
 )
 
 type Repository struct{
