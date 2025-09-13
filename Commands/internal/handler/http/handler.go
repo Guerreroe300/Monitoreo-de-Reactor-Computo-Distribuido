@@ -5,21 +5,20 @@ import (
 	"log"
 	"net/http"
 	"encoding/json"
-	"strconv"
 
-	temperature "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/controller/temperature"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository"
+	commands "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/controller/commands"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/repository"
 )
 
 type Handler struct{
-	ctrl *temperature.Controller
+	ctrl *commands.Controller
 }
 
-func New(ctrl *temperature.Controller) *Handler{
+func New(ctrl *commands.Controller) *Handler{
 	return &Handler{ctrl: ctrl}
 }
 
-func (h* Handler) GetTemperature(w http.ResponseWriter, req *http.Request) {
+func (h* Handler) GetNextCommand(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	m, err := h.ctrl.Get(ctx)
@@ -39,17 +38,15 @@ func (h* Handler) GetTemperature(w http.ResponseWriter, req *http.Request) {
 
 }
 
-func (h* Handler) PutTemperature(w http.ResponseWriter, req *http.Request) {
-	temp:= req.FormValue("temp")
-	tempf, conErr := strconv.ParseFloat(temp, 32)
-	temp32 := float32(tempf)
-	if(temp == "" || conErr != nil){
+func (h* Handler) PutNewCommand(w http.ResponseWriter, req *http.Request) {
+	cmd:= req.FormValue("cmd")
+	if(cmd == ""){
 		w.WriteHeader(http.StatusBadRequest)
 	}
 
 	ctx := req.Context()
 
-	err := h.ctrl.Put(ctx, temp32)
+	err := h.ctrl.Put(ctx, &cmd)
 
 	if (err != nil){
 		log.Printf("Error Putting: %v\n", err)

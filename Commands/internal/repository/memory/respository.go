@@ -3,44 +3,41 @@ package memory
 import (
 	"context"
 	"sync"
-	"time"
 
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/internal/repository"
-	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/ServerInterface/pkg/model"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/repository"
 )
 
-type Repository struct{
+type Commands struct{
 	sync.RWMutex
-	data *model.Temperature
+	data []*string 	
 }
 
-func New() *Repository{
-	return &Repository{data: &model.Temperature{Temperature:10.0, Date: time.Now()}}
+func New() *Commands {
+	return &Commands{}
 }
 
-func (r *Repository) Get(_ context.Context) (*model.Temperature, error){
+func (r *Commands) Pop(_ context.Context) (*string, error){
 	r.RLock()
 	defer r.RUnlock()
-
-	m := r.data
-
-	if m == nil{
-		return nil, repository.ErrNotFound
+	
+	//Popping the last element
+	if len(r.data) > 0 {
+		m := r.data[len(r.data)-1]
+		r.data = r.data[:len(r.data)-1]
+		return m, nil
+	} else {
+		return nil, repository.ErrListEmpty
 	}
-
-	return m, nil
 }
 
-func (r *Repository) Put(_ context.Context, temp float32) (error){
+func (r *Commands) Append(_ context.Context, comand *string) (error){
 	r.Lock()
 	defer r.Unlock()
 
-	if (r.data == nil){
-		r.data = &model.Temperature{}
-	}
-
-	r.data.Temperature = temp
-	r.data.Date = time.Now()
+	r.data = append(r.data, comand)
 
 	return nil
 }
+
+
+
