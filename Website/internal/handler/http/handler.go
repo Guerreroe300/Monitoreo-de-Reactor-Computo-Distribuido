@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strconv"
 
 	website "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/controller/website"
 )
@@ -72,12 +71,6 @@ func (h *Handler) MainHtml(w http.ResponseWriter, req *http.Request) {
 func (h *Handler) TableGet(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
-	rows := []Row{
-		{"Apples", "10"},
-		{"Oranges", "20"},
-		{"Bananas", "15"},
-	}
-
 	temps, err := h.ctrl.GetAllDB(ctx)
 
 	if err != nil{
@@ -85,10 +78,6 @@ func (h *Handler) TableGet(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 	
-	for _, element := range temps{
-		rows = append(rows, Row{element.Date.String(), strconv.FormatFloat(float64(element.Temperature), 'f', -1, 32)})
-	}
-
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(temps)
 }
