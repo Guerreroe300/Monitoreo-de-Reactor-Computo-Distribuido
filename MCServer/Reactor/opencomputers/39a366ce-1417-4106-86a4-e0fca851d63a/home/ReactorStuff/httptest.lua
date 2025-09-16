@@ -3,7 +3,7 @@ local internet = require("internet")
 local os = require("os")
 
 -- Target URL
-local url = "http://172.29.27.244:8081/putTemp?temp=2134.98"
+local url = "http://192.168.1.83:8081/putTemp?temp=2134.98"
 
 while true do
   -- Perform GET request
