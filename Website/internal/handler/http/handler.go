@@ -8,12 +8,6 @@ import (
 	website "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/controller/website"
 )
 
-// to be removed for Temperature
-type Row struct {
-	Name  string `json:"name"`
-	Value string `json:"value"`
-}
-
 type Handler struct {
 	ctrl *website.Controller
 }
@@ -41,7 +35,7 @@ func (h *Handler) MainHtml(w http.ResponseWriter, req *http.Request) {
 			</table>
 			
 			<br>
-			<button onclick="doSomething()">Do Something</button>
+			<button onclick="doSomething()">Shutdown Reactor</button>
 
 			<script>
 				// Fetch table data
@@ -58,8 +52,6 @@ func (h *Handler) MainHtml(w http.ResponseWriter, req *http.Request) {
 
 				function doSomething() {
 					fetch('/api/doSomething', { method: 'POST' })
-						.then(res => res.text())
-						.then(msg => alert(msg));
 				}
 			</script>
 		</body>
@@ -87,7 +79,20 @@ func (h *Handler) ButtonHandler(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, "Use POST", http.StatusMethodNotAllowed)
 		return
 	}
-	// Your Go logic here
-	fmt.Println("Button was clicked! Doing something in Go...")
-	fmt.Fprint(w, "Go logic executed successfully!")
+	
+	// Maybe move this to Controller?? idk most likely yeah
+	url := "http://localhost:8082/putCmd?cmd=Shutdown"
+
+	resp, err := http.Get(url)
+
+	if err != nil {
+		fmt.Printf("Error creating request to Command service: %v\n", err)
+		return 
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		fmt.Printf("Command service returned %d", resp.StatusCode)
+		return 
+	}
 }
