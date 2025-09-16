@@ -11,6 +11,7 @@ COPY libraries ./libraries
 COPY mods ./mods
 COPY Reactor ./Reactor
 COPY server.properties ./server.properties
+COPY config ./config
 
 # Accept EULA
 RUN echo "eula=true" > eula.txt
