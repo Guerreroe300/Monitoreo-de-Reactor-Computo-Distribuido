@@ -1,0 +1,26 @@
+# This docker file is meant to be run with the root repo folder as its context
+# as such build with : docker build -f Commands/Dockerfile -t myapp-commands .
+# We build the binary
+FROM golang:1.25.1 AS builder
+
+WORKDIR /app
+
+# Copy go.mod/go.sum to cache deps
+COPY go.mod go.sum ./
+RUN go mod download
+
+# Copy entire repo (so all packages available)
+COPY . .
+
+# Build only this service
+WORKDIR /app/Temperature/cmd/main
+RUN go build -o /bin/temperature
+
+# Copy it for running
+FROM debian:bookworm-slim
+
+EXPOSE 8081
+
+COPY --from=builder /bin/temperature /bin/temperature
+ENTRYPOINT ["/bin/temperature"]
+
