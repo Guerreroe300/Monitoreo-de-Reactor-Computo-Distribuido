@@ -2,9 +2,6 @@ package db
 
 import (
 	"context"
-	"encoding/json"
-	"fmt"
-	"net/http"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/repository"
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/pkg/model"
@@ -17,12 +14,18 @@ type dbRepository interface {
 	GetAll(_ context.Context) ([]*model.Temperature, error)
 }
 
-type Controller struct {
-	repo dbRepository
+// Interface for a gateway to do external shit
+type temperatureGateway interface {
+	GetTempFromTempService(ctx context.Context) (*model.Temperature, error)
 }
 
-func New(repo dbRepository) *Controller {
-	return &Controller{repo: repo}
+type Controller struct {
+	repo        dbRepository
+	tempGateway temperatureGateway
+}
+
+func New(repo dbRepository, tempGateway temperatureGateway) *Controller {
+	return &Controller{repo: repo, tempGateway: tempGateway}
 }
 
 func (c *Controller) GetLatest(ctx context.Context) (*model.Temperature, error) {
@@ -41,36 +44,21 @@ func (c *Controller) Put(ctx context.Context, temp *model.Temperature) error {
 	return error
 }
 
-func (c *Controller) PutNewestTemp() error {
-	url := "http://localhost:8081/getTemp"
-
-	resp, err := http.Get(url)
+func (c *Controller) PutNewestTemp(ctx context.Context) error {
+	resp, err := c.tempGateway.GetTempFromTempService(ctx)
 
 	if err != nil {
-		fmt.Printf("Error creating request to Temp service: %v\n", err)
-		return err
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("Temp service returned %d", resp.StatusCode)
-		return repository.ErrHttpIssue
-	}
-
-	var temp model.Temperature
-	if err := json.NewDecoder(resp.Body).Decode(&temp); err != nil {
-		fmt.Printf("Error decoding JSON: %v\n", err)
 		return err
 	}
 
-	c.Put(resp.Request.Context(), &temp)
+	c.Put(ctx, resp)
 	return nil
 }
 
-func (c* Controller) GetAll(ctx context.Context) ([]*model.Temperature, error){
+func (c *Controller) GetAll(ctx context.Context) ([]*model.Temperature, error) {
 	temps, err := c.repo.GetAll(ctx)
 
-	if err != nil{
+	if err != nil {
 		return nil, repository.ErrListEmpty
 	}
 
