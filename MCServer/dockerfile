@@ -1,0 +1,22 @@
+FROM openjdk:8-jdk-slim
+
+WORKDIR /mc
+
+# Copy Forge server launcher, vanilla server, and libraries
+COPY forge-1.12.2-14.23.5.2859.jar ./forge.jar
+COPY minecraft_server.1.12.2.jar ./minecraft_server.1.12.2.jar
+COPY libraries ./libraries
+
+# Copy mods, config, world
+COPY mods ./mods
+COPY Reactor ./Reactor
+COPY server.properties ./server.properties
+
+# Accept EULA
+RUN echo "eula=true" > eula.txt
+
+# Expose Minecraft port
+EXPOSE 25566
+
+# Run the Forge jar
+CMD ["java", "-Xmx2G", "-Xms2G", "-jar", "forge.jar", "nogui"]

@@ -1,0 +1,15 @@
+build it:
+docker build -t mcserver:1.12.2 .
+
+run it:
+docker run -d -p 25565:25565 --name mc1 mcserver:1.12.2
+
+stop and remove it:
+docker stop mc1
+docker rm mc1
+
+look into persistency or dont, i dont care
+
+remember:
+docker.service
+docker ps -a
