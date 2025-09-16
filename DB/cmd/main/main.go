@@ -35,6 +35,7 @@ func main() {
 	go checkOnTemp(c)
 
 	http.Handle("/dbGetLatest", http.HandlerFunc(h.GetLatestTemp))
+	http.Handle("/getAll", http.HandlerFunc(h.GetAllTemps))
 
 	if err := http.ListenAndServe(fmt.Sprintf(":%d", port), nil); err != nil {
 		panic(err)

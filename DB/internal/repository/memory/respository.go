@@ -40,3 +40,14 @@ func (r *Commands) Put(_ context.Context, temp *model.Temperature) error {
 
 	return nil
 }
+
+func (r *Commands) GetAll(_ context.Context) ([]*model.Temperature, error){
+	r.RLock()
+	defer r.RUnlock()
+
+	if len(r.data) > 0 {
+		return r.data, nil
+	} else {
+		return nil, repository.ErrListEmpty
+	}
+}

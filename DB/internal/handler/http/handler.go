@@ -38,6 +38,25 @@ func (h *Handler) GetLatestTemp(w http.ResponseWriter, req *http.Request) {
 
 }
 
+func (h* Handler) GetAllTemps(w http.ResponseWriter, req *http.Request){
+	ctx := req.Context()
+
+	m, err := h.ctrl.GetAll(ctx)
+
+	if err != nil && errors.Is(err, repository.ErrNotFound) {
+		w.WriteHeader(http.StatusNotFound)
+		return
+	} else if err != nil {
+		log.Printf("Repository error: %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	}
+
+	if err := json.NewEncoder(w).Encode(m); err != nil {
+		log.Printf("Response Error: v%\n", err)
+	}
+}
+
 // nvm this function, i have to manually request from the interface every once in a while
 /*func (h *Handler) PutNewCommand(w http.ResponseWriter, req *http.Request) {
 	id := req.FormValue("id")

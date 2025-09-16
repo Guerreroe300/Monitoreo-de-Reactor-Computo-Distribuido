@@ -14,6 +14,7 @@ import (
 type dbRepository interface {
 	GetLatest(ctx context.Context) (*model.Temperature, error)
 	Put(ctx context.Context, temp *model.Temperature) error
+	GetAll(_ context.Context) ([]*model.Temperature, error)
 }
 
 type Controller struct {
@@ -64,4 +65,14 @@ func (c *Controller) PutNewestTemp() error {
 
 	c.Put(resp.Request.Context(), &temp)
 	return nil
+}
+
+func (c* Controller) GetAll(ctx context.Context) ([]*model.Temperature, error){
+	temps, err := c.repo.GetAll(ctx)
+
+	if err != nil{
+		return nil, repository.ErrListEmpty
+	}
+
+	return temps, nil
 }
