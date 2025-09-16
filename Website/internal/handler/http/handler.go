@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"strconv"
 
 	website "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/controller/website"
 )
@@ -23,19 +24,19 @@ func New(ctrl *website.Controller) *Handler {
 }
 
 // HTML
-func (h *Handler) MainHtml(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) MainHtml(w http.ResponseWriter, req *http.Request) {
 	html := `
 		<!DOCTYPE html>
 		<html>
 		<head>
-			<title>Go Table Example</title>
+			<title>Nuclar Reactor Momen</title>
 		</head>
 		<body>
-			<h1>Quick Go Table</h1>
+			<h1>Nuclear Reactor Temps</h1>
 
 			<table border="1" id="myTable">
 				<thead>
-					<tr><th>Name</th><th>Value</th></tr>
+					<tr><th>Time</th><th>Temps</th></tr>
 				</thead>
 				<tbody></tbody>
 			</table>
@@ -51,7 +52,7 @@ func (h *Handler) MainHtml(w http.ResponseWriter, r *http.Request) {
 						const tbody = document.querySelector('#myTable tbody');
 						rows.forEach(r => {
 							const tr = document.createElement('tr');
-							tr.innerHTML = '<td>' + r.name + '</td><td>' + r.value + '</td>';
+							tr.innerHTML = '<td>' + r.date + '</td><td>' + r.temperature + '</td>';
 							tbody.appendChild(tr);
 						});
 					});
@@ -68,18 +69,32 @@ func (h *Handler) MainHtml(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprint(w, html)
 }
 
-func (h *Handler) TableGet(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) TableGet(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
 	rows := []Row{
 		{"Apples", "10"},
 		{"Oranges", "20"},
 		{"Bananas", "15"},
 	}
+
+	temps, err := h.ctrl.GetAllDB(ctx)
+
+	if err != nil{
+		w.WriteHeader(http.StatusNotFound)
+		return
+	}
+	
+	for _, element := range temps{
+		rows = append(rows, Row{element.Date.String(), strconv.FormatFloat(float64(element.Temperature), 'f', -1, 32)})
+	}
+
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(rows)
+	json.NewEncoder(w).Encode(temps)
 }
 
-func (h *Handler) ButtonHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
+func (h *Handler) ButtonHandler(w http.ResponseWriter, req *http.Request) {
+	if req.Method != http.MethodPost {
 		http.Error(w, "Use POST", http.StatusMethodNotAllowed)
 		return
 	}
