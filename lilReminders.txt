@@ -3,3 +3,12 @@ docker run -d -p 8500:8500 -p 8600:8600/udp --name=dev-consul consul:1.15.4 agen
 
 Run a term on dockers
 docker exec -it <container-name-or-id> /bin/bash
+
+Build docker images:
+mc:
+docker build -t mcserver:1.12.2 .
+others (buildt on repo root):
+docker build -f Commands/Dockerfile -t myapp-commands .
+
+running:
+docker run -d -p 25565:25565 --name mc1 mcserver:1.12.2
