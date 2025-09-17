@@ -65,34 +65,27 @@ func (h *Handler) TableGet(w http.ResponseWriter, req *http.Request) {
 
 	temps, err := h.ctrl.GetAllDB(ctx)
 
-	if err != nil{
+	if err != nil {
 		w.WriteHeader(http.StatusNotFound)
 		return
 	}
-	
+
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(temps)
 }
 
 func (h *Handler) ButtonHandler(w http.ResponseWriter, req *http.Request) {
+	// Check we were called by post
 	if req.Method != http.MethodPost {
 		http.Error(w, "Use POST", http.StatusMethodNotAllowed)
 		return
 	}
-	
-	// Maybe move this to Controller?? idk most likely yeah
-	url := "http://localhost:8082/putCmd?cmd=Shutdown"
 
-	resp, err := http.Get(url)
+	// Maybe move this to Controller?? idk most likely yeah
+	err := h.ctrl.ShutdownButton(req.Context())
 
 	if err != nil {
-		fmt.Printf("Error creating request to Command service: %v\n", err)
-		return 
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusOK {
-		fmt.Printf("Command service returned %d", resp.StatusCode)
-		return 
+		fmt.Printf("Something went wrong requesting shutdown from cmd service")
+		return
 	}
 }

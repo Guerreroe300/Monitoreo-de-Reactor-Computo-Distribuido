@@ -1,20 +1,51 @@
 package main
 
 import (
+	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net/http"
-	"fmt"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/repository/memory"
+	"time"
+
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/controller/commands"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/handler/http"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/repository/memory"
+
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/discovery/consul"
+	discovery "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/registry"
 )
 
-func main(){
+const serviceName = "cmd"
+
+func main() {
 	var port int
 	flag.IntVar(&port, "port", 8082, "API handler port")
 	flag.Parse()
 	log.Printf("Starting metadata service on port %d", port)
+
+	// Registry Stuff:
+	registry, err := consul.NewRegistry("localhost:8500")
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := context.Background()
+
+	instanceID := discovery.GenerateInstanceID(serviceName)
+
+	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("localhost:%d", port)); err != nil {
+		panic(err)
+	}
+
+	go func() {
+		for {
+			if err := registry.ReportHealthyState(instanceID, serviceName); err != nil {
+				log.Println("Failed to report healthy state: " + err.Error())
+			}
+			time.Sleep(1 * time.Second)
+		}
+	}()
 
 	r := memory.New()
 	c := commands.New(r)
