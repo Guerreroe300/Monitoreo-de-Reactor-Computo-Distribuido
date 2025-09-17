@@ -12,3 +12,6 @@ docker build -f Commands/Dockerfile -t myapp-commands .
 
 running:
 docker run -d -p 25565:25565 --name mc1 mcserver:1.12.2
+
+
+also the services now mount based on an evironment variable called SERVICE_HOST and call consul on dev-consul:8500 for it to work on dicker, this does require them to be on the same dicker network

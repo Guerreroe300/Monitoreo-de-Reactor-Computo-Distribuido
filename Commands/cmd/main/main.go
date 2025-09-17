@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/controller/commands"
@@ -19,13 +20,17 @@ import (
 const serviceName = "cmd"
 
 func main() {
+	// name of service for docker, if running local just add this var: SERVICE_HOST=127.0.0.1
+	host := os.Getenv("SERVICE_HOST")
+
 	var port int
 	flag.IntVar(&port, "port", 8082, "API handler port")
 	flag.Parse()
 	log.Printf("Starting metadata service on port %d", port)
 
+	// consul for docker work, before localhost
 	// Registry Stuff:
-	registry, err := consul.NewRegistry("localhost:8500")
+	registry, err := consul.NewRegistry("dev-consul:8500")
 	if err != nil {
 		panic(err)
 	}
@@ -33,8 +38,9 @@ func main() {
 	ctx := context.Background()
 
 	instanceID := discovery.GenerateInstanceID(serviceName)
-
-	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("localhost:%d", port)); err != nil {
+	
+	// now 0.0.0.0 so it works on docker, before localhost
+	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
 		panic(err)
 	}
 

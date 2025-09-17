@@ -7,6 +7,7 @@ import (
 	"log"
 	"net/http"
 	"time"
+	"os"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/controller/website"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/handler/http"
@@ -21,13 +22,15 @@ import (
 const serviceName = "website"
 
 func main() {
+	host := os.Getenv("SERVICE_HOST")
+
 	var port int
 	flag.IntVar(&port, "port", 8080, "API handler port")
 	flag.Parse()
 	log.Printf("Starting website service on port %d", port)
 
 	// Registry Stuff:
-	registry, err := consul.NewRegistry("localhost:8500")
+	registry, err := consul.NewRegistry("dev-consul:8500")
 	if err != nil {
 		panic(err)
 	}
@@ -36,7 +39,7 @@ func main() {
 
 	instanceID := discovery.GenerateInstanceID(serviceName)
 
-	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("localhost:%d", port)); err != nil {
+	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
 		panic(err)
 	}
 
