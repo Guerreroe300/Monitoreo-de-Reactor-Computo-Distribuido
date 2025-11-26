@@ -11,6 +11,7 @@ import (
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
 )
 
 type Handler struct {
@@ -22,7 +23,7 @@ func New(ctrl *temperature.Controller) *Handler {
 	return &Handler{ctrl: ctrl}
 }
 
-func (h *Handler) GetTemperature(ctx context.Context) (*gen.GetSingleTemperatureResponse, error) {
+func (h *Handler) GetLatestTemperature(ctx context.Context, req *emptypb.Empty) (*gen.GetSingleTemperatureResponse, error) {
 	m, err := h.ctrl.Get(ctx)
 
 	if err != nil && errors.Is(err, repository.ErrNotFound) {
@@ -34,3 +35,5 @@ func (h *Handler) GetTemperature(ctx context.Context) (*gen.GetSingleTemperature
 
 	return &gen.GetSingleTemperatureResponse{TemperatureReading: model.TemperatureToProto(m)}, nil
 }
+
+// MISSING PUT FUCK

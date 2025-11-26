@@ -1,0 +1,78 @@
+package grpc_handler
+
+import (
+	"context"
+	"errors"
+	"log"
+
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/controller/db"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/repository"
+	model "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/pkg/model"
+	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/emptypb"
+)
+
+type Handler struct {
+	gen.UnimplementedTemperatureServiceServer
+	ctrl *db.Controller
+}
+
+func New(ctrl *db.Controller) *Handler {
+	return &Handler{ctrl: ctrl}
+}
+
+func (h *Handler) GetLatestTemperature(ctx context.Context, req *emptypb.Empty) (*gen.GetSingleTemperatureResponse, error) {
+	m, err := h.ctrl.GetLatest(ctx)
+
+	if err != nil && errors.Is(err, repository.ErrNotFound) {
+		return nil, status.Errorf(codes.NotFound, "temperature reading not found: %v", err)
+	} else if err != nil {
+		log.Printf("Repository error: %v\n", err)
+		return nil, status.Errorf(codes.Internal, "failed to retrieve temperature reading: %v", err)
+	}
+
+	return &gen.GetSingleTemperatureResponse{TemperatureReading: model.TemperatureToProto(m)}, nil
+}
+
+func (h *Handler) GetAllTemperatures(ctx context.Context, req *emptypb.Empty) (*gen.GetAllTemperaturesResponse, error) {
+	m, err := h.ctrl.GetAll(ctx)
+
+	if err != nil && errors.Is(err, repository.ErrNotFound) {
+		return nil, status.Errorf(codes.NotFound, "temperature reading not found: %v", err)
+	} else if err != nil {
+		log.Printf("Repository error: %v\n", err)
+		return nil, status.Errorf(codes.Internal, "failed to retrieve temperature reading: %v", err)
+	}
+
+	protoTemps := make([]*gen.Temperature, len(m))
+
+	for i, tempModel := range m {
+		protoTemps[i] = model.TemperatureToProto(tempModel)
+	}
+
+	return &gen.GetAllTemperaturesResponse{TemperatureReadings: protoTemps}, nil
+}
+
+// nvm this function, i have to manually request from the interface every once in a while
+/*func (h *Handler) PutNewCommand(w http.ResponseWriter, req *http.Request) {
+	id := req.FormValue("id")
+	tem
+	if id == "" {
+		w.WriteHeader(http.StatusBadRequest)
+	}
+
+	ctx := req.Context()
+
+	err := h.ctrl.Put(ctx, id)
+
+	if err != nil {
+		log.Printf("Error Putting: %v\n", err)
+		w.WriteHeader(http.StatusInternalServerError)
+		return
+	} else {
+		w.WriteHeader(http.StatusCreated)
+	}
+
+}*/
