@@ -26,10 +26,10 @@ func (h *Handler) GetTemperature(ctx context.Context) (*gen.GetSingleTemperature
 	m, err := h.ctrl.Get(ctx)
 
 	if err != nil && errors.Is(err, repository.ErrNotFound) {
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Errorf(codes.NotFound, "temperature reading not found: %v", err)
 	} else if err != nil {
 		log.Printf("Repository error: %v\n", err)
-		return nil, status.Errorf(codes.Internal, err.Error())
+		return nil, status.Errorf(codes.Internal, "failed to retrieve temperature reading: %v", err)
 	}
 
 	return &gen.GetSingleTemperatureResponse{TemperatureReading: model.TemperatureToProto(m)}, nil
