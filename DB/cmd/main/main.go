@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 	"os"
+	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/controller/db"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/handler/http"
@@ -33,13 +33,20 @@ const serviceName = "db"
 func main() {
 	host := os.Getenv("SERVICE_HOST")
 
+	// OUR PORT
 	var port int
 	flag.IntVar(&port, "port", 8083, "API handler port")
 	flag.Parse()
 	log.Printf("Starting database service on port %d", port)
 
 	// Registry Stuff:
-	registry, err := consul.NewRegistry("dev-consul:8500")
+	var registry *consul.Registry
+	var err error
+	if host == "localhost" {
+		registry, err = consul.NewRegistry("localhost:8500")
+	} else {
+		registry, err = consul.NewRegistry("dev-consul:8500")
+	}
 	if err != nil {
 		panic(err)
 	}

@@ -43,3 +43,24 @@ generate-protobuf-code-only-for-model:
 
 generate-protobuf-code-with-grpc:
 	protoc -I=api --go_out=. --go-grpc_out=. reactor.proto
+
+
+# RUN LOCALLY
+#run-mcserver-local:
+#	docker run -d -p 25566:25566 --name mcs --network=micro-net mcserver-service:latest
+
+run-cmd-local:
+	SERVICE_HOST=localhost go run Commands/cmd/main/main.go
+
+run-DB-local:
+	SERVICE_HOST=localhost go run DB/cmd/main/main.go
+
+run-temperature-local:
+	SERVICE_HOST=localhost go run Temperature/cmd/main/main.go
+
+run-website-local:
+	SERVICE_HOST=localhost go run Website/cmd/main/main.go
+
+# STILL needs to run on docker
+#run-consul-dev-server:
+#	docker run -d -p 8500:8500 -p 8600:8600/udp --name=dev-consul --network=micro-net consul:1.15.4 agent -server -ui -node=server-1 -bootstrap-expect=1 -client=0.0.0.0

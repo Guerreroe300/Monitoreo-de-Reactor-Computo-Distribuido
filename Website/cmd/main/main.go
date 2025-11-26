@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 	"os"
+	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/controller/website"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Website/internal/handler/http"
@@ -30,7 +30,13 @@ func main() {
 	log.Printf("Starting website service on port %d", port)
 
 	// Registry Stuff:
-	registry, err := consul.NewRegistry("dev-consul:8500")
+	var registry *consul.Registry
+	var err error
+	if host == "localhost" {
+		registry, err = consul.NewRegistry("localhost:8500")
+	} else {
+		registry, err = consul.NewRegistry("dev-consul:8500")
+	}
 	if err != nil {
 		panic(err)
 	}

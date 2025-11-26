@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 	"os"
+	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/controller/temperature"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/handler/http"
@@ -22,13 +22,20 @@ const serviceName = "temperature"
 func main() {
 	host := os.Getenv("SERVICE_HOST")
 
+	// Our port
 	var port int
 	flag.IntVar(&port, "port", 8081, "API handler port")
 	flag.Parse()
 	log.Printf("Starting metadata service on port %d", port)
 
 	// Registry Stuff:
-	registry, err := consul.NewRegistry("dev-consul:8500")
+	var registry *consul.Registry
+	var err error
+	if host == "localhost" {
+		registry, err = consul.NewRegistry("localhost:8500")
+	} else {
+		registry, err = consul.NewRegistry("dev-consul:8500")
+	}
 	if err != nil {
 		panic(err)
 	}
