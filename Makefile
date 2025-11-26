@@ -35,3 +35,11 @@ run-consul-dev-server:
 
 # Stops
 #ill do it later
+
+
+# GRPC stuff
+generate-protobuf-code-only-for-model:
+	protoc -I=api --go_out=. reactor.proto
+
+generate-protobuf-code-with-grpc:
+	protoc -I=api --go_out=. --go-grpc_out=. reactor.proto

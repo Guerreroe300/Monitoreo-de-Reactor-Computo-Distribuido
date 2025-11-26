@@ -1,0 +1,41 @@
+syntax = "proto3";
+option go_package = "/gen";
+import "google/protobuf/empty.proto";
+import "google/protobuf/timestamp.proto";
+
+service CommandService {
+    rpc GetNextCommand(google.protobuf.Empty) returns(GetNextCommandResponse);
+    rpc PutNewCommand(PutNewCommandRequest) returns(google.protobuf.Empty);
+}
+
+service TemperatureService {
+    rpc GetLatestTemperature(google.protobuf.Empty) returns (GetSingleTemperatureResponse);
+    rpc GetAllTemperatures(google.protobuf.Empty) returns (GetAllTemperaturesResponse);
+}
+
+
+message GetNextCommandResponse{
+   Command command = 1; 
+}
+
+message PutNewCommandRequest{
+    string command = 1;
+}
+
+message GetSingleTemperatureResponse {
+    Temperature temperature_reading = 1;
+}
+
+message GetAllTemperaturesResponse {
+    repeated Temperature temperature_readings = 1;
+}
+
+
+message Temperature {
+    float temperature = 1; 
+    google.protobuf.Timestamp date = 2; 
+}
+
+message Command {
+    string command = 1;
+}
