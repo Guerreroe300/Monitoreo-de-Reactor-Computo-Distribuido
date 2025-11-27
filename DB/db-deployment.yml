@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: db-deployment
+  namespace: reactor-space
+  labels:
+    app: db
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: db
+  template:
+    metadata:
+      labels:
+        app: db
+    spec:
+      containers:
+      - name: db-service
+        # IMPORTANT: This must match the name/tag of your local Docker image
+        image: db-service:latest
+        # Crucial for local images: tells Kubernetes NOT to pull from a registry
+        imagePullPolicy: IfNotPresent 
+        # Define all ports your application listens on internally
+        ports:
+          - containerPort: 8083 
+            name: grpc

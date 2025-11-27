@@ -1,0 +1,27 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mc-deployment
+  namespace: reactor-space
+  labels:
+    app: mc
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: mc
+  template:
+    metadata:
+      labels:
+        app: mc
+    spec:
+      containers:
+      - name: mcserver-service
+        # IMPORTANT: This must match the name/tag of your local Docker image
+        image: mcserver-service:latest
+        # Crucial for local images: tells Kubernetes NOT to pull from a registry
+        imagePullPolicy: IfNotPresent 
+        # Define all ports your application listens on internally
+        ports:
+          - containerPort: 25566
+            name: conectToGame
