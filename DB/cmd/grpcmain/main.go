@@ -3,10 +3,8 @@ package main
 import (
 	"context"
 	"flag"
-	"fmt"
 	"log"
 	"net"
-	"os"
 	"strconv"
 	"time"
 
@@ -15,8 +13,6 @@ import (
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/repository/memory"
 
 	temperatureGateway "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/DB/internal/gateway/temperature/grpc"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/discovery/consul"
-	discovery "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/registry"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
 	"google.golang.org/grpc"
@@ -32,10 +28,10 @@ func checkOnTemp(c *db.Controller, ctx context.Context) {
 	}
 }
 
-const serviceName = "db"
+//const serviceName = "db"
 
 func main() {
-	host := os.Getenv("SERVICE_HOST")
+	//host := os.Getenv("SERVICE_HOST")
 
 	// OUR PORT
 	var port int
@@ -44,42 +40,42 @@ func main() {
 	log.Printf("Starting database service on port %d", port)
 
 	// Registry Stuff:
-	var registry *consul.Registry
-	var err error
-	if host == "localhost" {
-		registry, err = consul.NewRegistry("localhost:8500")
-	} else {
-		registry, err = consul.NewRegistry("dev-consul:8500")
-	}
-	if err != nil {
-		panic(err)
-	}
+	//var registry *consul.Registry
+	//var err error
+	//if host == "localhost" {
+	//	registry, err = consul.NewRegistry("localhost:8500")
+	//} else {
+	//	registry, err = consul.NewRegistry("dev-consul:8500")
+	//}
+	//if err != nil {
+	//	panic(err)
+	//}
 
 	ctx := context.Background()
 
-	instanceID := discovery.GenerateInstanceID(serviceName)
+	//instanceID := discovery.GenerateInstanceID(serviceName)
 
-	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
-		panic(err)
-	}
+	//if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
+	//	panic(err)
+	//}
 
-	go func() {
-		for {
-			if err := registry.ReportHealthyState(instanceID, serviceName); err != nil {
-				log.Println("Failed to report healthy state: " + err.Error())
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	//go func() {
+	//	for {
+	//		if err := registry.ReportHealthyState(instanceID, serviceName); err != nil {
+	//			log.Println("Failed to report healthy state: " + err.Error())
+	//		}
+	//		time.Sleep(1 * time.Second)
+	//	}
+	//}()
 
-	tempGateway := temperatureGateway.New(registry)
+	tempGateway := temperatureGateway.New(1)
 	r := memory.New()
 	c := db.New(r, tempGateway)
 	h := grpcHandler.New(c)
 
 	go checkOnTemp(c, ctx)
 
-	lis, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
+	lis, err := net.Listen("tcp", "0.0.0.0"+":"+strconv.Itoa(port))
 	if err != nil {
 		log.Fatalf("Failed to listen : %v", err)
 	}

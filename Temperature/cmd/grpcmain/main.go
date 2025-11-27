@@ -1,32 +1,26 @@
 package main
 
 import (
-	"context"
 	"flag"
 	"fmt"
 	"log"
 	"net"
 	"net/http"
-	"os"
 	"strconv"
-	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/controller/temperature"
 	grpc_handler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/handler/grpc"
 	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/handler/http"
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/internal/repository/memory"
 
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/discovery/consul"
-	discovery "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/registry"
-
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
 	"google.golang.org/grpc"
 )
 
-const serviceName = "temperature"
+//const serviceName = "temperature"
 
 func main() {
-	host := os.Getenv("SERVICE_HOST")
+	//host := os.Getenv("SERVICE_HOST")
 
 	// Our port
 	var port int
@@ -38,35 +32,35 @@ func main() {
 	log.Printf("Starting MC listener on port %d", HTTPMCPORT)
 
 	// Registry Stuff:
-	var registry *consul.Registry
-	var err error
-	if host == "localhost" {
-		registry, err = consul.NewRegistry("localhost:8500")
-	} else {
-		registry, err = consul.NewRegistry("dev-consul:8500")
-	}
-	if err != nil {
-		panic(err)
-	}
+	//var registry *consul.Registry
+	//var err error
+	//if host == "localhost" {
+	//	registry, err = consul.NewRegistry("localhost:8500")
+	//} else {
+	//	registry, err = consul.NewRegistry("dev-consul:8500")
+	//}
+	//if err != nil {
+	//	panic(err)
+	//}
 
-	ctx := context.Background()
+	//ctx := context.Background()
 
-	instanceID := discovery.GenerateInstanceID(serviceName)
+	//instanceID := discovery.GenerateInstanceID(serviceName)
 
-	if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
-		panic(err)
-	}
+	//if err := registry.Register(ctx, instanceID, serviceName, fmt.Sprintf("%s:%d", host, port)); err != nil {
+	//	panic(err)
+	//}
 
-	go func() {
-		for {
-			if err := registry.ReportHealthyState(instanceID, serviceName); err != nil {
-				log.Println("Failed to report healthy state: " + err.Error())
-			}
-			time.Sleep(1 * time.Second)
-		}
-	}()
+	//go func() {
+	//	for {
+	//		if err := registry.ReportHealthyState(instanceID, serviceName); err != nil {
+	//			log.Println("Failed to report healthy state: " + err.Error())
+	//		}
+	//		time.Sleep(1 * time.Second)
+	//	}
+	//}()
 
-	defer registry.Deregister(ctx, instanceID, serviceName)
+	//defer registry.Deregister(ctx, instanceID, serviceName)
 
 	r := memory.New()
 	c := temperature.New(r)
@@ -74,7 +68,7 @@ func main() {
 	h2 := httpHandler.New(c)
 
 	go func() {
-		lis, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
+		lis, err := net.Listen("tcp", "0.0.0.0"+":"+strconv.Itoa(port))
 		if err != nil {
 			log.Fatalf("Failed to listen : %v", err)
 		}
@@ -87,7 +81,7 @@ func main() {
 
 	http.Handle("/putTemp", http.HandlerFunc(h2.PutTemperature))
 
-	if err := http.ListenAndServe(fmt.Sprintf(":%d", HTTPMCPORT), nil); err != nil {
+	if err := http.ListenAndServe(fmt.Sprintf("0.0.0.0:%d", HTTPMCPORT), nil); err != nil {
 		panic(err)
 	}
 }

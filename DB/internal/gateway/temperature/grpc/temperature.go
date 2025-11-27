@@ -5,23 +5,23 @@ import (
 	"fmt"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Temperature/pkg/model"
-	discovery "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/registry"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/protobuf/types/known/emptypb"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/grpcutil"
 )
 
 type Gateway struct {
-	registry discovery.Registry
+	registry int
 }
 
-func New(registry discovery.Registry) *Gateway {
+func New(registry int) *Gateway {
 	return &Gateway{registry: registry}
 }
 
 func (g *Gateway) GetTempFromTempService(ctx context.Context) (*model.Temperature, error) {
-	conn, err := grpcutil.ServiceConnection(ctx, "temperature", g.registry)
+	conn, err := grpc.NewClient("http://temp-service.reactor-space:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

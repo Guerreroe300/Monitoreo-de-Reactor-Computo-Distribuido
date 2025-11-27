@@ -4,22 +4,22 @@ import (
 	"context"
 	"fmt"
 
-	discovery "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/pkg/registry"
-
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
-	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/grpcutil"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
 type Gateway struct {
-	registry discovery.Registry
+	registry int
 }
 
-func New(registry discovery.Registry) *Gateway {
+func New(registry int) *Gateway {
 	return &Gateway{registry: registry}
 }
 
 func (g *Gateway) PutShutdownCommand(ctx context.Context) error {
-	conn, err := grpcutil.ServiceConnection(ctx, "cmd", g.registry)
+	conn, err := grpc.NewClient("http://commands-service.reactor-space:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
