@@ -21,7 +21,7 @@ func New(registry int) *Gateway {
 }
 
 func (g *Gateway) GetAllFromDBService(ctx context.Context) ([]*model.Temperature, error) {
-	conn, err := grpc.NewClient("http://db-service.reactor-space:8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("db-service.reactor-space:8083", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

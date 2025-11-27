@@ -21,7 +21,7 @@ func New(registry int) *Gateway {
 }
 
 func (g *Gateway) GetTempFromTempService(ctx context.Context) (*model.Temperature, error) {
-	conn, err := grpc.NewClient("http://temp-service.reactor-space:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("temp-service.reactor-space:8081", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return nil, err
 	}

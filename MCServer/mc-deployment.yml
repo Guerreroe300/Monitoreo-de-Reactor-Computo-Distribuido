@@ -6,7 +6,7 @@ metadata:
   labels:
     app: mc
 spec:
-  replicas: 2
+  replicas: 1
   selector:
     matchLabels:
       app: mc
@@ -24,4 +24,4 @@ spec:
         # Define all ports your application listens on internally
         ports:
           - containerPort: 25566
-            name: conectToGame
+            name: conecttogame

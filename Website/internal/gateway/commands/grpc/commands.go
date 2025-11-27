@@ -19,7 +19,7 @@ func New(registry int) *Gateway {
 }
 
 func (g *Gateway) PutShutdownCommand(ctx context.Context) error {
-	conn, err := grpc.NewClient("http://commands-service.reactor-space:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	conn, err := grpc.NewClient("commands-service.reactor-space:8082", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		return err
 	}
