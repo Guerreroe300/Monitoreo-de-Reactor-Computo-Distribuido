@@ -13,7 +13,7 @@ RUN go mod download
 COPY . .
 
 # Build only this service
-WORKDIR /app/DB/cmd/main
+WORKDIR /app/DB/cmd/grpcmain
 RUN go build -o /bin/DB
 
 # Copy it for running

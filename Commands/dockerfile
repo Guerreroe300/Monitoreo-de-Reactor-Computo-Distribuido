@@ -13,13 +13,13 @@ RUN go mod download
 COPY . .
 
 # Build only this service
-WORKDIR /app/Commands/cmd/main
+WORKDIR /app/Commands/cmd/grpcmain
 RUN go build -o /bin/commands
 
 # Copy it for running
 FROM debian:bookworm-slim
 
-EXPOSE 8082
+EXPOSE 8082 8091
 
 COPY --from=builder /bin/commands /bin/commands
 ENTRYPOINT ["/bin/commands"]

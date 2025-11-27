@@ -50,16 +50,16 @@ generate-protobuf-code-with-grpc:
 #	docker run -d -p 25566:25566 --name mcs --network=micro-net mcserver-service:latest
 
 run-cmd-local:
-	SERVICE_HOST=localhost go run Commands/cmd/main/main.go
+	SERVICE_HOST=localhost go run Commands/cmd/grpcmain/main.go
 
 run-DB-local:
-	SERVICE_HOST=localhost go run DB/cmd/main/main.go
+	SERVICE_HOST=localhost go run DB/cmd/grpcmain/main.go
 
 run-temperature-local:
-	SERVICE_HOST=localhost go run Temperature/cmd/main/main.go
+	SERVICE_HOST=localhost go run Temperature/cmd/grpcmain/main.go
 
 run-website-local:
-	SERVICE_HOST=localhost go run Website/cmd/main/main.go
+	SERVICE_HOST=localhost go run Website/cmd/grpcmain/main.go
 
 # STILL needs to run on docker
 #run-consul-dev-server:

@@ -13,13 +13,13 @@ RUN go mod download
 COPY . .
 
 # Build only this service
-WORKDIR /app/Temperature/cmd/main
+WORKDIR /app/Temperature/cmd/grpcmain
 RUN go build -o /bin/temperature
 
 # Copy it for running
 FROM debian:bookworm-slim
 
-EXPOSE 8081
+EXPOSE 8081 8090
 
 COPY --from=builder /bin/temperature /bin/temperature
 ENTRYPOINT ["/bin/temperature"]
