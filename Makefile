@@ -19,13 +19,13 @@ run-mcserver:
 	docker run -d -p 25566:25566 --name mcs --network=micro-net mcserver-service:latest
 
 run-cmd:
-	docker run -d -p 8082:8082 -e SERVICE_HOST=cmd-serv --name cmd-serv --network=micro-net cmd-service:latest
+	docker run -d -p 8082:8082 -p 8091:8091 -e SERVICE_HOST=cmd-serv --name cmd-serv --network=micro-net cmd-service:latest
 
 run-DB:
 	docker run -d -p 8083:8083 -e SERVICE_HOST=db-serv --name db-serv --network=micro-net db-service:latest
 
 run-temperature:
-	docker run -d -p 8081:8081 -e SERVICE_HOST=temp-serv --name temp-serv --network=micro-net temp-service:latest
+	docker run -d -p 8081:8081 -p 8090:8090 -e SERVICE_HOST=temp-serv --name temp-serv --network=micro-net temp-service:latest
 
 run-website:
 	docker run -d -p 8080:8080 -e SERVICE_HOST=web-serv --name web-serv --network=micro-net website-service:latest
