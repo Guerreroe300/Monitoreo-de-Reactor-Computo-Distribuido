@@ -6,12 +6,14 @@ import (
 	"fmt"
 	"log"
 	"net"
+	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/controller/commands"
 	grpcHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/handler/grpc"
+	httpHandler "github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/handler/http"
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/Commands/internal/repository/memory"
 	"github.com/Guerreroe300/Monitoreo-de-Reactor-Computo-Distribuido/src/gen"
 	"google.golang.org/grpc"
@@ -27,9 +29,12 @@ func main() {
 	host := os.Getenv("SERVICE_HOST")
 
 	var port int
+	var HTTPMCPORT int
 	flag.IntVar(&port, "port", 8082, "API handler port")
+	flag.IntVar(&HTTPMCPORT, "HTTPMCPORT", 8091, "Port for MC server to getCommand")
 	flag.Parse()
 	log.Printf("Starting metadata service on port %d", port)
+	log.Printf("Starting MC listener on port %d", HTTPMCPORT)
 
 	// consul for docker work, before localhost
 	// Registry Stuff:
@@ -65,14 +70,22 @@ func main() {
 	r := memory.New()
 	c := commands.New(r)
 	h := grpcHandler.New(c)
+	h2 := httpHandler.New(c)
 
-	lis, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
-	if err != nil {
-		log.Fatalf("Failed to listen : %v", err)
-	}
-	srv := grpc.NewServer()
-	gen.RegisterCommandServiceServer(srv, h)
-	if err := srv.Serve(lis); err != nil {
+	go func() {
+		lis, err := net.Listen("tcp", host+":"+strconv.Itoa(port))
+		if err != nil {
+			log.Fatalf("Failed to listen : %v", err)
+		}
+		srv := grpc.NewServer()
+		gen.RegisterCommandServiceServer(srv, h)
+		if err := srv.Serve(lis); err != nil {
+			panic(err)
+		}
+	}()
+
+	http.Handle("/getCmd", http.HandlerFunc(h2.GetNextCommand))
+	if err := http.ListenAndServe(fmt.Sprintf(":%d", HTTPMCPORT), nil); err != nil {
 		panic(err)
 	}
 }
